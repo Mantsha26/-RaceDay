@@ -54,13 +54,15 @@ Section B API Endpoint Plan.pdf
 
 RaceDayDB.sql
 
+validate-docs.yml
+
 .github/
 
 README.md/
 
 workflows/
 
-validate-docs.yml
+
 
 ---
 
