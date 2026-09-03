@@ -11,6 +11,8 @@ on:
       - main
       - master
 
+  workflow_dispatch: {}
+
 jobs:
   validate-docs:
     runs-on: ubuntu-latest
@@ -19,24 +21,36 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Check docs folder exists
+      - name: Check docs folder and required files
         run: |
-          if [ ! -d docs ]; then
-            echo "docs folder is missing."
+          set -eo pipefail
+
+          if [ ! -d "docs" ]; then
+            echo "ERROR: docs folder is missing."
             exit 1
           fi
 
-      - name: Check ERD exists
-        run: |
-          test -f "docs/Section A_RaceDay ERD.pdf"
+          missing=0
 
-      - name: Check API Endpoint Plan exists
-        run: |
-          test -f "docs/Section B API Endpoint Plan.pdf"
+          required_files=(
+            "docs/Section A_RaceDay ERD.pdf"
+            "docs/Section B API Endpoint Plan.pdf"
+            "docs/RaceDayDB.sql"
+          )
 
-      - name: Check SQL Script exists
-        run: |
-          test -f "docs/RaceDayDB.sql"
+          for f in "${required_files[@]}"; do
+            if [ ! -f "$f" ]; then
+              echo "MISSING: $f"
+              missing=1
+            else
+              echo "FOUND:  $f"
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            echo "One or more required planning documents are missing."
+            exit 1
+          fi
 
       - name: Success Message
         run: echo "All required planning documents are present."
