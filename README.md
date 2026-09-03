@@ -44,20 +44,26 @@ The project is divided into three POE sections:
 
 ## Project Folder Structure
 
+## Project Folder Structure
 
+```text
 RaceDay/
 ├── .github/
 │   └── workflows/
 │       └── validate-docs.yml
+│
 ├── docs/
 │   ├── Section_A_RaceDay_ERD.pdf
 │   ├── Section_B_API_Endpoint_Plan.pdf
-│   └──  RaceDayDB.sql
-|
+│   ├── RaceDayDB.sql
+│   
+│
 ├── .gitattributes
 ├── .gitignore
 ├── LICENSE
 └── README.md
+```
+
 
 
 
