@@ -1,6 +1,4 @@
 
-
-
 /*==========================================================
   RaceDay Event Management System
   SQL Server Database Script
