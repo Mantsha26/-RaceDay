@@ -98,10 +98,5 @@ GitHub Actions Build
 
 YouTube Link
 
-(Add your GitHub repository URL here.)
-
-Example:
-
-https://github.com/YourUsername/RaceDay-Event-Management-System
-
+<https://youtu.be/9lHgfsM8xrw>
 
