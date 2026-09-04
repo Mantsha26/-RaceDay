@@ -1,422 +1,425 @@
--- =========================================================
--- DATA6222 - DATABASE (INTERMEDIATE)
--- ASSIGNMENT 1
--- ART GALLERY DATABASE
--- =========================================================
--- =========================================================
--- RESET DATABASE FOR TESTING
--- =========================================================
 
-USE master;
-GO
 
-IF DB_ID(N'ArtGalleryDB') IS NOT NULL
+
+/*==========================================================
+  RaceDay Event Management System
+  SQL Server Database Script
+  POE Section C
+  Compatible with SQL Server Management Studio (SSMS)
+==========================================================*/
+
+-- ==========================================
+-- CREATE DATABASE
+-- ==========================================
+
+IF DB_ID('RaceDayDB') IS NOT NULL
 BEGIN
-    ALTER DATABASE ArtGalleryDB
-    SET SINGLE_USER
-    WITH ROLLBACK IMMEDIATE;
-
-    DROP DATABASE ArtGalleryDB;
-END
+    DROP DATABASE RaceDayDB;
+END;
 GO
 
-CREATE DATABASE ArtGalleryDB;
+CREATE DATABASE RaceDayDB;
 GO
 
-USE ArtGalleryDB;
+USE RaceDayDB;
 GO
-
--- =========================================================
--- STEP 1: CREATE DATABASE
--- =========================================================
-
-IF DB_ID(N'ArtGalleryDB') IS NULL
-BEGIN
-    CREATE DATABASE ArtGalleryDB;
-END
-GO
-
-USE ArtGalleryDB;
-GO
-
 
 -- =========================================================
 -- OPTIONAL: REMOVE OLD TABLES
 -- This makes the script safe to run again during testing.
 -- =========================================================
 
-IF OBJECT_ID(N'Entry', N'U') IS NOT NULL
-    DROP TABLE Entry;
+IF OBJECT_ID(N'Users', N'U') IS NOT NULL
+    DROP TABLE Users;
 GO
 
-IF OBJECT_ID(N'Artwork', N'U') IS NOT NULL
-    DROP TABLE Artwork;
+IF OBJECT_ID(N'Organisers', N'U') IS NOT NULL
+    DROP TABLE Organisers;
 GO
 
-IF OBJECT_ID(N'Exhibition', N'U') IS NOT NULL
-    DROP TABLE Exhibition;
+IF OBJECT_ID(N'ParticipantProfiles', N'U') IS NOT NULL
+    DROP TABLE ParticipantProfiles;
 GO
 
-IF OBJECT_ID(N'Artist', N'U') IS NOT NULL
-    DROP TABLE Artist;
+IF OBJECT_ID(N'Events', N'U') IS NOT NULL
+    DROP TABLE Events;
 GO
 
-IF OBJECT_ID(N'Genre', N'U') IS NOT NULL
-    DROP TABLE Genre;
+IF OBJECT_ID(N'Categories', N'U') IS NOT NULL
+    DROP TABLE Categories;
 GO
 
+IF OBJECT_ID(N'Enrolments', N'U') IS NOT NULL
+    DROP TABLE Enrolments;
+GO
 
--- =========================================================
--- STEP 1.1: CREATE GENRE TABLE
--- =========================================================
+IF OBJECT_ID(N'Results', N'U') IS NOT NULL
+    DROP TABLE Results;
+GO
 
-CREATE TABLE Genre
-(
-    GenreID INT PRIMARY KEY,
-    Description VARCHAR(100) NOT NULL
+/*==========================================================
+  TABLE: Users
+==========================================================*/
+
+CREATE TABLE Users (
+    user_id INT IDENTITY(1,1) PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL
+        CHECK (role IN ('Admin','Organiser','Participant')),
+    phone VARCHAR(20) UNIQUE,
+    created_at DATETIME DEFAULT GETDATE()
 );
+
 GO
 
+/*==========================================================
+  TABLE: Organisers
+==========================================================*/
 
--- =========================================================
--- STEP 1.2: CREATE ARTIST TABLE
--- =========================================================
+CREATE TABLE Organisers (
+    organiser_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    organisation_name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    created_at DATETIME DEFAULT GETDATE(),
 
-CREATE TABLE Artist
-(
-    ArtistID INT IDENTITY(1,1) PRIMARY KEY,
-    Name VARCHAR(50) NOT NULL,
-    Surname VARCHAR(50) NOT NULL
+    CONSTRAINT FK_Organiser_User
+        FOREIGN KEY(user_id)
+        REFERENCES Users(user_id)
 );
+
 GO
 
+/*==========================================================
+  TABLE: ParticipantProfiles
+==========================================================*/
 
--- =========================================================
--- STEP 1.3: CREATE ARTWORK TABLE
--- =========================================================
+CREATE TABLE ParticipantProfiles (
+    profile_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    date_of_birth DATE NOT NULL,
+    gender VARCHAR(20)
+        CHECK (gender IN ('Male','Female','Other')),
+    address VARCHAR(150),
+    emergency_contact VARCHAR(100),
+    created_at DATETIME DEFAULT GETDATE(),
 
-CREATE TABLE Artwork
-(
-    ArtworkID INT IDENTITY(1,1) PRIMARY KEY,
-    GenreID INT NOT NULL,
-    ArtistID INT NOT NULL,
-    Title VARCHAR(150) NOT NULL,
-
-    CONSTRAINT FK_Artwork_Genre
-        FOREIGN KEY (GenreID)
-        REFERENCES Genre(GenreID),
-
-    CONSTRAINT FK_Artwork_Artist
-        FOREIGN KEY (ArtistID)
-        REFERENCES Artist(ArtistID)
+    CONSTRAINT FK_Profile_User
+        FOREIGN KEY(user_id)
+        REFERENCES Users(user_id)
 );
+
 GO
 
+/*==========================================================
+  TABLE: Events
+==========================================================*/
 
--- =========================================================
--- STEP 1.4: CREATE EXHIBITION TABLE
--- =========================================================
+CREATE TABLE Events (
+    event_id INT IDENTITY(1,1) PRIMARY KEY,
+    organiser_id INT NOT NULL,
+    event_name VARCHAR(100) NOT NULL,
+    event_date DATE NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    event_image_url VARCHAR(255),
+    created_at DATETIME DEFAULT GETDATE(),
 
-CREATE TABLE Exhibition
-(
-    ExhibitionID INT IDENTITY(1,1) PRIMARY KEY,
-    Description VARCHAR(150) NOT NULL
+    CONSTRAINT FK_Event_Organiser
+        FOREIGN KEY(organiser_id)
+        REFERENCES Organisers(organiser_id)
 );
+
 GO
 
+/*==========================================================
+  TABLE: Categories
+==========================================================*/
 
--- =========================================================
--- STEP 1.5: CREATE ENTRY JUNCTION TABLE
--- =========================================================
+CREATE TABLE Categories (
+    category_id INT IDENTITY(1,1) PRIMARY KEY,
+    event_id INT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(255),
+    min_age INT NOT NULL,
+    max_age INT NOT NULL,
+    created_at DATETIME DEFAULT GETDATE(),
 
-CREATE TABLE Entry
-(
-    EntryID INT IDENTITY(1,1) PRIMARY KEY,
-    ArtworkID INT NOT NULL,
-    ExhibitionID INT NOT NULL,
+    CONSTRAINT FK_Category_Event
+        FOREIGN KEY(event_id)
+        REFERENCES Events(event_id),
 
-    CONSTRAINT FK_Entry_Artwork
-        FOREIGN KEY (ArtworkID)
-        REFERENCES Artwork(ArtworkID)
-        ON DELETE CASCADE,
-
-    CONSTRAINT FK_Entry_Exhibition
-        FOREIGN KEY (ExhibitionID)
-        REFERENCES Exhibition(ExhibitionID)
+    CONSTRAINT CHK_AgeRange
+        CHECK (min_age <= max_age)
 );
+
 GO
 
+/*==========================================================
+  TABLE: Enrolments
+==========================================================*/
 
--- =========================================================
--- STEP 2: POPULATE DATABASE
--- =========================================================
+CREATE TABLE Enrolments (
+    enrolment_id INT IDENTITY(1,1) PRIMARY KEY,
+    profile_id INT NOT NULL,
+    category_id INT NOT NULL,
+    enrolment_date DATETIME DEFAULT GETDATE(),
+    status VARCHAR(20) DEFAULT 'Registered'
+        CHECK (status IN ('Registered','Completed','Cancelled')),
 
+    CONSTRAINT FK_Enrolment_Profile
+        FOREIGN KEY(profile_id)
+        REFERENCES ParticipantProfiles(profile_id),
 
--- =========================================================
--- STEP 2.1: INSERT GENRES
--- =========================================================
+    CONSTRAINT FK_Enrolment_Category
+        FOREIGN KEY(category_id)
+        REFERENCES Categories(category_id),
 
-INSERT INTO Genre (GenreID, Description)
+    CONSTRAINT UQ_Profile_Category
+        UNIQUE(profile_id, category_id)
+);
+
+GO
+
+/*==========================================================
+  TABLE: Results
+==========================================================*/
+
+CREATE TABLE Results (
+    result_id INT IDENTITY(1,1) PRIMARY KEY,
+    enrolment_id INT NOT NULL UNIQUE,
+    position INT CHECK(position > 0),
+    time_seconds DECIMAL(8,2),
+    points INT DEFAULT 0,
+    created_at DATETIME DEFAULT GETDATE(),
+
+    CONSTRAINT FK_Result_Enrolment
+        FOREIGN KEY(enrolment_id)
+        REFERENCES Enrolments(enrolment_id)
+);
+
+GO
+
+/*==========================================================
+  SAMPLE DATA
+==========================================================*/
+
+-------------------------
+-- USERS
+-------------------------
+
+INSERT INTO Users
+(first_name,last_name,email,password_hash,role,phone)
 VALUES
-(1, 'Surrealism'),
-(2, 'Impressionism'),
-(3, 'Abstract'),
-(4, 'Realism'),
-(5, 'Pop Art');
+('Sarah','Mokoena',
+'[email protected]','hash123','Organiser','0821112233'),
+
+('David','Naidoo',
+'[email protected]','hash456','Organiser','0832223344'),
+
+('John','Smith',
+'[email protected]','hash789','Participant','0715551111'),
+
+('Amina','Khan',
+'[email protected]','hash987','Participant','0726662222'),
+
+('Admin','User',
+'[email protected]','adminhash','Admin','0800000000');
+
 GO
 
+-------------------------
+-- ORGANISERS
+-------------------------
 
--- =========================================================
--- STEP 2.2: INSERT ARTISTS
--- =========================================================
-
-INSERT INTO Artist (Name, Surname)
+INSERT INTO Organisers
+(user_id,organisation_name,description)
 VALUES
-('Vincent', 'van Gogh'),
-('Pablo', 'Picasso'),
-('Claude', 'Monet'),
-('Salvador', 'Dali'),
-('Frida', 'Kahlo');
+(1,'Cape Striders Club',
+'Community road running organiser'),
+
+(2,'Durban Athletics Association',
+'Official athletics organiser');
+
 GO
 
+-------------------------
+-- PARTICIPANT PROFILES
+-------------------------
 
--- =========================================================
--- STEP 2.3: INSERT ARTWORKS
--- Minimum required: 20
--- =========================================================
-
-INSERT INTO Artwork (GenreID, ArtistID, Title)
+INSERT INTO ParticipantProfiles
+(user_id,date_of_birth,gender,address,emergency_contact)
 VALUES
-(2, 1, 'Starry Night'),
-(2, 1, 'Sunflowers'),
-(2, 1, 'The Potato Eaters'),
-(2, 1, 'Irises'),
+(3,'2004-05-18','Male',
+'12 Beach Road, Cape Town',
+'Mary Smith - 0718881111'),
 
-(3, 2, 'Guernica'),
-(3, 2, 'The Weeping Woman'),
-(3, 2, 'Les Demoiselles d''Avignon'),
-(3, 2, 'The Old Guitarist'),
+(4,'2006-11-02','Female',
+'45 Palm Avenue, Durban',
+'Ahmed Khan - 0729993333');
 
-(2, 3, 'Water Lilies'),
-(2, 3, 'Impression, Sunrise'),
-(2, 3, 'Woman with a Parasol'),
-(2, 3, 'The Magpie'),
-
-(1, 4, 'The Persistence of Memory'),
-(1, 4, 'Swans Reflecting Elephants'),
-(1, 4, 'The Burning Giraffe'),
-(1, 4, 'Metamorphosis of Narcissus'),
-
-(4, 5, 'The Two Fridas'),
-(4, 5, 'Self-Portrait with Thorn Necklace'),
-(4, 5, 'The Broken Column'),
-(4, 5, 'The Wounded Deer');
 GO
 
+-------------------------
+-- EVENTS
+-------------------------
 
--- =========================================================
--- STEP 2.4: INSERT EXHIBITIONS
--- Minimum required: 15
--- =========================================================
-
-INSERT INTO Exhibition (Description)
+INSERT INTO Events
+(organiser_id,event_name,event_date,location,description,event_image_url)
 VALUES
-('Spring Art Expo'),
-('Modern Masterpieces'),
-('Surreal Visions'),
-('Impressionist Era'),
-('Global Canvas 2026'),
-('Abstract Expressions'),
-('Parisian Retrospective'),
-('Classical Realism'),
-('Contemporary Echoes'),
-('African Art Summit'),
-('Heritage & Vision'),
-('Avant-Garde Showcase'),
-('Colors of Summer'),
-('The Masterworks'),
-('Annual Fine Arts Gala');
+(1,'Cape Town Marathon',
+'2026-10-10',
+'Cape Town Stadium',
+'Annual city marathon.',
+'images/capetown.jpg'),
+
+(1,'Table Mountain Trail Run',
+'2026-11-01',
+'Table Mountain',
+'Mountain trail running event.',
+'images/tablemountain.jpg'),
+
+(2,'Durban Summer Fun Run',
+'2026-12-05',
+'Durban Beachfront',
+'Family fun run along the beach.',
+'images/durban.jpg');
+
 GO
 
+-------------------------
+-- CATEGORIES
+-------------------------
 
--- =========================================================
--- STEP 2.5: INSERT ENTRIES
--- Artwork 1 appears in multiple exhibitions.
--- This is important for the HAVING query.
--- =========================================================
-
-INSERT INTO Entry (ArtworkID, ExhibitionID)
+INSERT INTO Categories
+(event_id,name,description,min_age,max_age)
 VALUES
-(1, 1),
-(1, 4),
-(1, 14),
 
-(2, 1),
-(3, 2),
-(4, 4),
+(1,'5 KM',
+'Short distance marathon.',
+12,60),
 
-(5, 2),
-(6, 6),
-(7, 6),
-(8, 2),
+(1,'10 KM',
+'Intermediate marathon category.',
+15,65),
 
-(9, 4),
-(10, 4),
-(11, 13),
-(12, 4),
+(1,'21 KM Half Marathon',
+'Half marathon challenge.',
+18,70),
 
-(13, 3),
-(14, 3),
-(15, 3),
-(16, 3),
+(2,'10 KM Trail',
+'Mountain trail race.',
+18,60),
 
-(17, 8),
-(18, 8),
-(19, 8),
-(20, 8);
+(2,'21 KM Trail',
+'Long distance trail race.',
+21,65),
+
+(3,'3 KM Fun Run',
+'Family friendly run.',
+8,70),
+
+(3,'5 KM Fun Run',
+'Beachfront running category.',
+12,65);
+
 GO
 
+-------------------------
+-- ENROLMENTS
+-------------------------
 
--- =========================================================
--- STEP 3: UPDATE STATEMENT
--- =========================================================
+INSERT INTO Enrolments
+(profile_id,category_id,status)
+VALUES
+(1,2,'Registered'),
 
-UPDATE Artwork
-SET Title = 'The Persistence of Memory (Restored Edition)'
-WHERE ArtworkID = 13;
+(1,4,'Completed'),
+
+(2,6,'Registered'),
+
+(2,7,'Completed');
+
 GO
 
+-------------------------
+-- RESULTS
+-------------------------
 
--- =========================================================
--- STEP 4: DELETE STATEMENT
--- Delete Artwork 20.
---
--- Because Entry has ON DELETE CASCADE, deleting the
--- artwork automatically deletes its related Entry record.
--- =========================================================
+INSERT INTO Results
+(enrolment_id,position,time_seconds,points)
+VALUES
+(2,3,4520.50,18),
 
-DELETE FROM Artwork
-WHERE ArtworkID = 20;
+(4,1,1450.25,25);
+
 GO
+PRINT 'RaceDay Database Created Successfully';
 
+SELECT COUNT(*) AS Users FROM Users;
+SELECT COUNT(*) AS Organisers FROM Organisers;
+SELECT COUNT(*) AS Participants FROM ParticipantProfiles;
+SELECT COUNT(*) AS Events FROM Events;
+SELECT COUNT(*) AS Categories FROM Categories;
+SELECT COUNT(*) AS Enrolments FROM Enrolments;
+SELECT COUNT(*) AS Results FROM Results;
+/*==========================================================
+  TEST QUERIES
+==========================================================*/
 
--- =========================================================
--- STEP 5: ARTWORK REPORT
--- ORDER BY
---
--- Displays:
--- Genre
--- Artwork Title
--- Artist Name
---
--- Results are sorted alphabetically by Genre and Title.
--- =========================================================
+-- View Users
+SELECT * FROM Users;
 
+-- View Organisers
+SELECT * FROM Organisers;
+
+-- View Events with Organiser
 SELECT
-    g.Description AS [Genre],
-    a.Title AS [Artwork Title],
-    CONCAT(ar.Name, ' ', ar.Surname) AS [Artist Name]
-FROM Artwork AS a
-INNER JOIN Genre AS g
-    ON a.GenreID = g.GenreID
-INNER JOIN Artist AS ar
-    ON a.ArtistID = ar.ArtistID
-ORDER BY
-    g.Description ASC,
-    a.Title ASC;
-GO
+E.event_name,
+O.organisation_name,
+E.location,
+E.event_date
+FROM Events E
+JOIN Organisers O
+ON E.organiser_id = O.organiser_id;
 
-
--- =========================================================
--- STEP 6: GROUP BY REPORT
---
--- Displays the total number of artworks created by
--- each artist.
---
--- LEFT JOIN ensures that an artist will still appear
--- even if they have no artwork.
--- =========================================================
-
+-- Participant Enrolments
 SELECT
-    CONCAT(ar.Name, ' ', ar.Surname) AS [Artist Name],
-    COUNT(a.ArtworkID) AS [Total Artworks]
-FROM Artist AS ar
-LEFT JOIN Artwork AS a
-    ON ar.ArtistID = a.ArtistID
-GROUP BY
-    ar.ArtistID,
-    ar.Name,
-    ar.Surname
-ORDER BY
-    [Total Artworks] DESC,
-    [Artist Name] ASC;
-GO
+U.first_name + ' ' + U.last_name AS Participant,
+E.event_name,
+C.name AS Category,
+EN.status
+FROM Enrolments EN
+JOIN ParticipantProfiles P
+ON EN.profile_id = P.profile_id
+JOIN Users U
+ON P.user_id = U.user_id
+JOIN Categories C
+ON EN.category_id = C.category_id
+JOIN Events E
+ON C.event_id = E.event_id;
 
-
--- =========================================================
--- STEP 7: HAVING CLAUSE REPORT
---
--- Displays artworks that appear in MORE THAN ONE
--- exhibition.
--- =========================================================
-
+-- Results
 SELECT
-    a.ArtworkID,
-    a.Title AS [Artwork Title],
-    COUNT(e.ExhibitionID) AS [Exhibition Count]
-FROM Artwork AS a
-INNER JOIN Entry AS e
-    ON a.ArtworkID = e.ArtworkID
-GROUP BY
-    a.ArtworkID,
-    a.Title
-HAVING COUNT(e.ExhibitionID) > 1
-ORDER BY
-    [Exhibition Count] DESC,
-    [Artwork Title] ASC;
-GO
+U.first_name + ' ' + U.last_name AS Participant,
+EV.event_name,
+CAT.name AS Category,
+R.position,
+R.time_seconds,
+R.points
+FROM Results R
+JOIN Enrolments EN
+ON R.enrolment_id = EN.enrolment_id
+JOIN ParticipantProfiles PP
+ON EN.profile_id = PP.profile_id
+JOIN Users U
+ON PP.user_id = U.user_id
+JOIN Categories CAT
+ON EN.category_id = CAT.category_id
+JOIN Events EV
+ON CAT.event_id = EV.event_id;
 
-
--- =========================================================
--- STEP 8: JOINS REPORT
---
--- Displays a complete catalogue containing:
--- Artwork
--- Artist
--- Genre
--- Exhibition
---
--- LEFT JOIN is used for Entry and Exhibition so that
--- artworks without an exhibition can still be displayed.
--- =========================================================
-
-SELECT
-    a.ArtworkID,
-    a.Title AS [Artwork Title],
-    CONCAT(ar.Name, ' ', ar.Surname) AS [Artist Name],
-    g.Description AS [Genre],
-    ex.Description AS [Exhibition Name]
-FROM Artwork AS a
-INNER JOIN Artist AS ar
-    ON a.ArtistID = ar.ArtistID
-INNER JOIN Genre AS g
-    ON a.GenreID = g.GenreID
-LEFT JOIN Entry AS en
-    ON a.ArtworkID = en.ArtworkID
-LEFT JOIN Exhibition AS ex
-    ON en.ExhibitionID = ex.ExhibitionID
-ORDER BY
-    a.ArtworkID ASC;
-GO
-
-
--- =========================================================
--- STEP 9: VERIFY THE DATA
--- =========================================================
-
-SELECT * FROM Genre;
-SELECT * FROM Artist;
-SELECT * FROM Artwork;
-SELECT * FROM Exhibition;
-SELECT * FROM Entry;
 GO
