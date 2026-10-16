@@ -267,28 +267,7 @@ The `validate-docs.yml` workflow checks that the required Part 1 documentation a
 
 ### GitHub Actions Build Status
 
-[![RaceDay API CI/CD](https://github.com/Mantsha26/RaceDay/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/Mantsha26/RaceDay/actions)
-
-View workflow runs and build results:
-
-https://github.com/Mantsha26/RaceDay/actions
-
-A successful workflow should show a green status after the required build and test jobs pass.
-
-## 13. Repository
-
-GitHub repository:
-
-https://github.com/Mantsha26/RaceDay
-
-## 14. Demonstration Video
-
-The demonstration video should show the API running, Swagger endpoints, authentication, role-based access, database operations, automated tests, and GitHub Actions.
-
-YouTube demonstration:
-
-https://youtu.be/9lHgfsM8xrw
-
+<img width="1886" height="902" alt="image" src="https://github.com/user-attachments/assets/adcd0b46-7340-48bf-aae9-0da543fc80f1" />
 
 
 ## 16. Conclusion
