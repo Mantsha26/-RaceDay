@@ -1,0 +1,9 @@
+@{
+    ViewData["Title"] = "Something went wrong";
+    var message = ViewData["Message"] as string ?? "Something went wrong on our side. Please try again.";
+}
+<div class="form-panel">
+    <h1>That didn't work</h1>
+    <p>@message</p>
+    <a class="btn btn-brand" asp-controller="Home" asp-action="Index">Back to races</a>
+</div>

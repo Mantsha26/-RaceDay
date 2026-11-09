@@ -1,0 +1,52 @@
+@model RegisterForm
+@{ ViewData["Title"] = "Register"; }
+<div class="form-panel">
+    <h1>Create an account</h1>
+    <form method="post" asp-action="Register">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+        <label asp-for="FirstName">First name</label>
+        <input asp-for="FirstName" class="form-control mb-1" autocomplete="given-name" />
+        <span asp-validation-for="FirstName" class="field-error"></span>
+        <label asp-for="LastName" class="mt-2">Last name</label>
+        <input asp-for="LastName" class="form-control mb-1" autocomplete="family-name" />
+        <span asp-validation-for="LastName" class="field-error"></span>
+        <label asp-for="Email" class="mt-2">Email</label>
+        <input asp-for="Email" type="email" class="form-control mb-1" autocomplete="email" />
+        <span asp-validation-for="Email" class="field-error"></span>
+        <label asp-for="Phone" class="mt-2">Phone (optional)</label>
+        <input asp-for="Phone" class="form-control mb-1" autocomplete="tel" />
+        <label asp-for="Password" class="mt-2">Password</label>
+        <input asp-for="Password" type="password" class="form-control mb-1" autocomplete="new-password" />
+        <span asp-validation-for="Password" class="field-error"></span>
+        <label asp-for="Role" class="mt-2">Account type</label>
+        <select asp-for="Role" class="form-select mb-2" id="roleSelect">
+            <option value="Participant">Participant: I want to race</option>
+            <option value="Organiser">Organiser: I run events</option>
+        </select>
+        <div id="dobField">
+            <label asp-for="DateOfBirth">Date of birth</label>
+            <input asp-for="DateOfBirth" type="date" max="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control mb-1" />
+            <span asp-validation-for="DateOfBirth" class="field-error"></span>
+        </div>
+        <div id="organisationField">
+            <label asp-for="OrganisationName">Organisation name</label>
+            <input asp-for="OrganisationName" class="form-control mb-1" />
+        </div>
+        <button type="submit" class="btn btn-brand w-100 mt-3">Create account</button>
+    </form>
+    <p class="mt-3 mb-0">Already registered? <a asp-action="Login">Log in</a></p>
+</div>
+@section Scripts {
+    <script>
+        const roleSelect = document.getElementById('roleSelect');
+        const dobField = document.getElementById('dobField');
+        const organisationField = document.getElementById('organisationField');
+        function updateRoleFields() {
+            const organiser = roleSelect.value === 'Organiser';
+            dobField.hidden = organiser;
+            organisationField.hidden = !organiser;
+        }
+        roleSelect.addEventListener('change', updateRoleFields);
+        updateRoleFields();
+    </script>
+}

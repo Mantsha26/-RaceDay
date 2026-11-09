@@ -1,0 +1,40 @@
+@model EnrolmentsPage
+@{ ViewData["Title"] = "Enrolments"; }
+<p class="mb-1"><a asp-action="Events">Back to events</a></p>
+<h1>Enrolments for @Model.Event.EventName</h1>
+
+@if (Model.Enrolments.Count == 0)
+{
+    <div class="empty-state"><p>Nobody has enrolled yet.</p></div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Participant</th><th>Category</th><th>Enrolled</th><th>Status</th><th>Change status</th></tr></thead>
+            <tbody>
+                @foreach (var e in Model.Enrolments)
+                {
+                    <tr>
+                        <td>@e.ParticipantName</td>
+                        <td>@e.CategoryName</td>
+                        <td>@(e.EnrolmentDate?.ToString("dd MMM yyyy") ?? "")</td>
+                        <td><partial name="_StatusBadge" model="e.Status" /></td>
+                        <td>
+                            <form method="post" asp-action="UpdateEnrolmentStatus" class="status-form">
+                                <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                                <input type="hidden" name="enrolmentId" value="@e.EnrolmentId" />
+                                <label class="visually-hidden" for="status-@e.EnrolmentId">Status for @e.ParticipantName</label>
+                                <select id="status-@e.EnrolmentId" name="status" class="form-select form-select-sm">
+                                    <option value="Pending" selected="@(e.Status != "Confirmed")">Pending</option>
+                                    <option value="Confirmed" selected="@(e.Status == "Confirmed")">Confirmed</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-night">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

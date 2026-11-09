@@ -1,0 +1,88 @@
+@model List<RaceEvent>
+@{
+    ViewData["Title"] = "Upcoming races";
+    string? type = ViewBag.Type;
+    decimal? maxDistance = ViewBag.MaxDistance;
+}
+<div class="hero">
+    <h1>Find your next finish line.</h1>
+    <p>Browse upcoming races, pick your category and take your place on the start line.</p>
+</div>
+
+<form method="get" class="filter-bar row g-3 align-items-end">
+    <div class="col-lg-4">
+        <label for="search">Event or location</label>
+        <input id="search" name="search" value="@ViewBag.Search" class="form-control" placeholder="Soweto, trail, park run" />
+    </div>
+    <div class="col-6 col-lg-2">
+        <label for="type">Event type</label>
+        <select id="type" name="type" class="form-select">
+            <option value="">All types</option>
+            @foreach (var t in new[] { "Road", "Trail", "Track" })
+            {
+                <option value="@t" selected="@(type == t)">@t</option>
+            }
+        </select>
+    </div>
+    <div class="col-6 col-lg-2">
+        <label for="maxDistance">Distance</label>
+        <select id="maxDistance" name="maxDistance" class="form-select">
+            <option value="">Any distance</option>
+            @foreach (var (value, label) in new[] { (5m, "Up to 5 km"), (10m, "Up to 10 km"), (21.1m, "Up to 21.1 km"), (42.2m, "Up to 42.2 km") })
+            {
+                <option value="@value.ToString(System.Globalization.CultureInfo.InvariantCulture)" selected="@(maxDistance == value)">@label</option>
+            }
+        </select>
+    </div>
+    <div class="col-6 col-lg-2">
+        <label for="from">From date</label>
+        <input id="from" type="date" name="from" value="@ViewBag.From" min="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" />
+    </div>
+    <div class="col-6 col-lg-2 d-flex gap-2">
+        <button class="btn btn-brand flex-fill" type="submit">Filter</button>
+        <a class="btn btn-outline-night" asp-action="Index">Clear</a>
+    </div>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-warning" role="alert">@ViewBag.Error</div>
+}
+
+@if (Model.Count == 0)
+{
+    <div class="empty-state">
+        <p>No upcoming races match your search.</p>
+        <a class="btn btn-outline-night" asp-action="Index">Show all races</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var ev in Model)
+        {
+            <div class="col-md-6 col-xl-4">
+                <article class="race-card">
+                    @if (!string.IsNullOrWhiteSpace(ev.EventImageUrl))
+                    {
+                        <img class="race-banner" src="@ev.EventImageUrl" alt="Banner for @ev.EventName" />
+                    }
+                    <div class="race-card-body">
+                        <div class="bib" aria-label="@ev.EventDate.ToString("d MMMM yyyy")">
+                            <span class="bib-day">@ev.EventDate.ToString("dd")</span>
+                            <span class="bib-month">@ev.EventDate.ToString("MMM")</span>
+                        </div>
+                        <div>
+                            <span class="type-tag">@ev.EventType</span>
+                            <h3>@ev.EventName</h3>
+                            <p class="meta"><span>@ev.Location</span><span>@ev.DistanceKm km</span></p>
+                        </div>
+                    </div>
+                    <div class="race-card-footer">
+                        <a class="btn btn-brand" asp-controller="Home" asp-action="Details" asp-route-id="@ev.EventId">View race</a>
+                    </div>
+                </article>
+            </div>
+        }
+    </div>
+}

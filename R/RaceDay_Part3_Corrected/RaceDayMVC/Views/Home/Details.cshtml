@@ -1,0 +1,61 @@
+@model RaceEvent
+@{
+    ViewData["Title"] = Model.EventName;
+    var role = Context.Session.GetString("Role");
+    var finished = Model.EventDate.Date < DateTime.Today;
+}
+@if (!string.IsNullOrWhiteSpace(Model.EventImageUrl))
+{
+    <img class="detail-banner mb-4" src="@Model.EventImageUrl" alt="Banner for @Model.EventName" />
+}
+<span class="type-tag">@Model.EventType</span>
+<h1 class="mt-2">@Model.EventName</h1>
+<p class="meta lead mb-3">
+    <span>@Model.Location</span>
+    <span>@Model.EventDate.ToString("dddd, d MMMM yyyy")</span>
+    <span>@Model.DistanceKm km</span>
+</p>
+@if (!string.IsNullOrWhiteSpace(Model.Description))
+{
+    <p>@Model.Description</p>
+}
+
+<h2 class="mt-4 mb-3">Choose your category</h2>
+@if (Model.Categories.Count == 0)
+{
+    <div class="empty-state"><p>The organiser hasn't added categories yet. Check back soon.</p></div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var cat in Model.Categories.OrderBy(c => c.MinAge).ThenBy(c => c.Name))
+        {
+            <div class="col-md-6 col-xl-4">
+                <div class="category-card">
+                    <h3>@cat.Name</h3>
+                    @if (!string.IsNullOrWhiteSpace(cat.Description)) { <p class="mb-1">@cat.Description</p> }
+                    <p class="age">Ages @cat.MinAge to @cat.MaxAge</p>
+                    @if (role == "Participant")
+                    {
+                        if (finished)
+                        {
+                            <span class="text-muted">Enrolment closed. This race has finished.</span>
+                        }
+                        else
+                        {
+                            <form method="post" asp-controller="Participant" asp-action="Enrol">
+                                <input type="hidden" name="categoryId" value="@cat.CategoryId" />
+                                <input type="hidden" name="eventId" value="@Model.EventId" />
+                                <button type="submit" class="btn btn-brand">Enrol in @cat.Name</button>
+                            </form>
+                        }
+                    }
+                    else if (role == null)
+                    {
+                        <a class="btn btn-outline-night" asp-controller="Account" asp-action="Login">Log in to enrol</a>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,0 +1,27 @@
+@model ProfileForm
+@{ ViewData["Title"] = "Profile"; }
+<h1>My profile</h1>
+@if (!string.IsNullOrWhiteSpace(Model.ProfilePictureUrl))
+{
+    <img src="@Model.ProfilePictureUrl" alt="Your profile photo" class="profile-photo mb-3" />
+}
+<form method="post" enctype="multipart/form-data" class="form-panel">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+    <label asp-for="FirstName">First name</label>
+    <input asp-for="FirstName" required class="form-control mb-2" />
+    <label asp-for="LastName">Last name</label>
+    <input asp-for="LastName" required class="form-control mb-2" />
+    <label asp-for="Email">Email</label>
+    <input asp-for="Email" readonly class="form-control mb-2" />
+    <label asp-for="Phone">Phone</label>
+    <input asp-for="Phone" class="form-control mb-2" />
+    <label asp-for="Address">Address</label>
+    <input asp-for="Address" class="form-control mb-2" />
+    <label asp-for="Gender">Gender</label>
+    <input asp-for="Gender" class="form-control mb-2" />
+    <label asp-for="EmergencyContact">Emergency contact</label>
+    <input asp-for="EmergencyContact" class="form-control mb-2" />
+    <label for="picture">Profile photo (JPG, PNG or WebP, max 5 MB)</label>
+    <input id="picture" type="file" name="picture" accept="image/png,image/jpeg,image/webp" class="form-control mb-3" />
+    <button type="submit" class="btn btn-brand">Save profile</button>
+</form>

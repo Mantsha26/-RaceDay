@@ -1,0 +1,147 @@
+/* RaceDay theme: night navy, track orange, bib yellow. One stylesheet for every page. */
+:root {
+  --rd-night: #0f1c2e;
+  --rd-night-2: #1b2f4b;
+  --rd-track: #e8501c;
+  --rd-track-dark: #c13f12;
+  --rd-bib: #ffc72c;
+  --rd-chalk: #f3f5f8;
+  --rd-ink: #18212f;
+  --rd-muted: #5b6678;
+  --rd-line: #dde2ea;
+  --rd-go: #17803d;
+  --rd-go-bg: #dcf3e4;
+  --rd-wait: #8a5a00;
+  --rd-wait-bg: #fff0c9;
+  --rd-radius: 12px;
+  --bs-body-font-family: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bs-body-color: var(--rd-ink);
+  --bs-body-bg: var(--rd-chalk);
+  --bs-link-color: var(--rd-track-dark);
+  --bs-link-hover-color: var(--rd-track);
+}
+
+body { font-family: var(--bs-body-font-family); font-size: 1.05rem; line-height: 1.55; min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1; }
+
+h1, h2, h3, h4, .h1, .h2, .h3, .h4, .h5, .navbar-brand, .bib, .stat strong {
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+h1 { font-size: clamp(2rem, 4.5vw, 2.9rem); margin-bottom: 1rem; }
+h2, .h2 { font-size: 1.7rem; }
+h3, .h5 { font-size: 1.35rem; }
+p { max-width: 70ch; }
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--rd-bib);
+  outline-offset: 2px;
+}
+
+/* Navigation: a lane line runs under the bar */
+.rd-nav { background: var(--rd-night); border-bottom: 4px solid var(--rd-track); }
+.rd-nav .navbar-brand { color: #fff; font-size: 1.7rem; }
+.rd-nav .navbar-brand span { color: var(--rd-bib); }
+.rd-nav .nav-link { color: #cfd8e6; font-weight: 600; }
+.rd-nav .nav-link:hover, .rd-nav .nav-link.active { color: #fff; }
+.rd-nav .nav-link.active { box-shadow: inset 0 -3px 0 var(--rd-bib); }
+.role-tag { background: var(--rd-night-2); color: var(--rd-bib); border-radius: 999px; padding: .15rem .7rem; font-size: .85rem; font-weight: 600; margin-right: .75rem; }
+
+/* Buttons */
+.btn { font-weight: 600; border-radius: 8px; }
+.btn-brand { background: var(--rd-track); border-color: var(--rd-track); color: #fff; }
+.btn-brand:hover, .btn-brand:focus { background: var(--rd-track-dark); border-color: var(--rd-track-dark); color: #fff; }
+.btn-outline-night { border: 2px solid var(--rd-night); color: var(--rd-night); background: transparent; }
+.btn-outline-night:hover { background: var(--rd-night); color: #fff; }
+.btn-bib { background: var(--rd-bib); border-color: var(--rd-bib); color: var(--rd-night); }
+.btn-bib:hover { background: #f0b800; border-color: #f0b800; color: var(--rd-night); }
+
+/* Hero: lane lines */
+.hero {
+  background:
+    repeating-linear-gradient(115deg, transparent 0 46px, rgba(255, 255, 255, .06) 46px 50px),
+    linear-gradient(120deg, var(--rd-night), var(--rd-night-2));
+  color: #fff;
+  border-radius: var(--rd-radius);
+  padding: 3rem 2rem;
+  margin-bottom: 1.5rem;
+  border-left: 8px solid var(--rd-track);
+}
+.hero h1 { font-size: clamp(2.4rem, 6vw, 4rem); margin-bottom: .5rem; }
+.hero p { color: #d3dbe8; margin: 0; font-size: 1.15rem; }
+
+/* Filter bar */
+.filter-bar { background: #fff; border: 1px solid var(--rd-line); border-radius: var(--rd-radius); padding: 1rem; margin-bottom: 1.5rem; }
+.filter-bar label { font-weight: 600; font-size: .95rem; margin-bottom: .2rem; }
+
+/* Race cards: the date is the bib */
+.race-card { background: #fff; border: 1px solid var(--rd-line); border-radius: var(--rd-radius); height: 100%; display: flex; flex-direction: column; overflow: hidden; }
+.race-banner { height: 170px; width: 100%; object-fit: cover; }
+.race-card-body { display: flex; gap: 1rem; padding: 1.1rem 1.1rem .5rem; flex: 1; }
+.race-card-footer { padding: 0 1.1rem 1.1rem; }
+.bib { flex: none; width: 64px; height: 72px; background: var(--rd-bib); color: var(--rd-night); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 6px solid var(--rd-track); }
+.bib-day { font-size: 2rem; line-height: 1; }
+.bib-month { font-size: 1rem; font-weight: 700; }
+.race-card h3 { margin: .25rem 0 .35rem; }
+.meta { display: flex; flex-wrap: wrap; gap: .25rem 1rem; color: var(--rd-muted); margin: 0; }
+.type-tag { display: inline-block; background: var(--rd-night); color: #fff; border-radius: 4px; padding: 0 .5rem; font-size: .85rem; font-weight: 600; }
+
+/* Panels, forms, tables */
+.form-panel { max-width: 640px; background: #fff; padding: 2rem; border-radius: var(--rd-radius); border: 1px solid var(--rd-line); }
+.form-panel label { font-weight: 600; margin-bottom: .25rem; }
+.form-control, .form-select { border-radius: 8px; border-color: #c5ccd8; }
+.form-control:focus, .form-select:focus { border-color: var(--rd-track); box-shadow: 0 0 0 .2rem rgba(232, 80, 28, .2); }
+.field-error { color: #b42318; font-size: .92rem; display: block; margin-bottom: .5rem; }
+.validation-summary-errors ul { margin: 0 0 1rem; padding-left: 1.2rem; }
+
+.table { --bs-table-bg: #fff; border-color: var(--rd-line); }
+.table thead th { background: var(--rd-night); color: #fff; font-weight: 600; border: 0; white-space: nowrap; }
+.table-responsive { border-radius: var(--rd-radius); border: 1px solid var(--rd-line); background: #fff; }
+.table-responsive .table { margin: 0; }
+.row-actions { display: flex; flex-wrap: wrap; gap: .25rem .9rem; align-items: center; }
+.row-actions form { display: inline; margin: 0; }
+
+/* Stats and panels */
+.stat { background: #fff; border: 1px solid var(--rd-line); border-left: 6px solid var(--rd-track); border-radius: var(--rd-radius); padding: 1.25rem 1.5rem; }
+.stat strong { display: block; font-size: 3rem; color: var(--rd-night); }
+.stat p { margin: 0; color: var(--rd-muted); }
+.panel { background: #fff; border: 1px solid var(--rd-line); border-radius: var(--rd-radius); padding: 1.25rem 1.5rem; }
+.next-list { list-style: none; margin: 0; padding: 0; }
+.next-list li { display: flex; gap: 1rem; align-items: center; padding: .6rem 0; border-bottom: 1px solid var(--rd-line); }
+.next-list li:last-child { border-bottom: 0; }
+.next-date { flex: none; width: 5.5rem; font-weight: 700; color: var(--rd-track-dark); }
+
+/* Enrolment status: colour plus a word, never colour alone */
+.status-badge { display: inline-flex; align-items: center; gap: .4rem; border-radius: 999px; padding: .15rem .75rem; font-weight: 600; font-size: .92rem; }
+.status-badge::before { content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: currentColor; }
+.status-badge.is-confirmed { background: var(--rd-go-bg); color: var(--rd-go); }
+.status-badge.is-pending { background: var(--rd-wait-bg); color: var(--rd-wait); }
+.status-form { display: flex; gap: .5rem; align-items: center; }
+.status-form .form-select { width: auto; }
+
+/* Detail + profile */
+.detail-banner { width: 100%; max-height: 360px; object-fit: cover; border-radius: var(--rd-radius); }
+.profile-photo { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 4px solid var(--rd-bib); }
+.category-card { background: #fff; border: 1px solid var(--rd-line); border-radius: var(--rd-radius); padding: 1.25rem; height: 100%; }
+.category-card .age { color: var(--rd-muted); }
+.empty-state { background: #fff; border: 2px dashed var(--rd-line); border-radius: var(--rd-radius); padding: 2rem; text-align: center; color: var(--rd-muted); }
+.empty-state p { margin: 0 auto .75rem; }
+
+/* Alerts */
+.alert { border-radius: var(--rd-radius); border-width: 0 0 0 6px; }
+.alert-success { background: var(--rd-go-bg); color: #0f5a2b; border-color: var(--rd-go); }
+.alert-danger { background: #fde7e4; color: #8a1c10; border-color: #c93a2a; }
+.alert-warning { background: var(--rd-wait-bg); color: var(--rd-wait); border-color: var(--rd-bib); }
+
+footer.rd-footer { background: var(--rd-night); color: #b7c2d3; padding: 1.5rem 0; margin-top: 3rem; border-top: 4px solid var(--rd-track); }
+footer.rd-footer strong { color: var(--rd-bib); }
+
+@media (max-width: 576px) {
+  .hero { padding: 2rem 1.25rem; }
+  .form-panel { padding: 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+.validation-summary-valid { display: none; }

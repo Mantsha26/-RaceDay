@@ -1,0 +1,5 @@
+@model string
+@{
+    var confirmed = string.Equals(Model, "Confirmed", StringComparison.OrdinalIgnoreCase);
+}
+<span class="status-badge @(confirmed ? "is-confirmed" : "is-pending")">@(confirmed ? "Confirmed" : "Pending")</span>

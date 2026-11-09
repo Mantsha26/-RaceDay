@@ -1,0 +1,41 @@
+@model List<RaceEvent>
+@{ ViewData["Title"] = "Manage events"; }
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="mb-0">Manage events</h1>
+    <a class="btn btn-brand" asp-action="EditEvent">New event</a>
+</div>
+@if (Model.Count == 0)
+{
+    <div class="empty-state"><p>No events yet. Create one to start taking enrolments.</p></div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Event</th><th>Date</th><th>Type</th><th>Distance</th><th>Actions</th></tr></thead>
+            <tbody>
+                @foreach (var e in Model.OrderBy(e => e.EventDate))
+                {
+                    <tr>
+                        <td>@e.EventName</td>
+                        <td>@e.EventDate.ToString("dd MMM yyyy")</td>
+                        <td>@e.EventType</td>
+                        <td>@e.DistanceKm km</td>
+                        <td>
+                            <div class="row-actions">
+                                <a asp-action="EditEvent" asp-route-id="@e.EventId">Edit</a>
+                                <a asp-action="Categories" asp-route-id="@e.EventId">Categories</a>
+                                <a asp-action="Enrolments" asp-route-id="@e.EventId">Enrolments</a>
+                                <a asp-action="Results" asp-route-id="@e.EventId">Results</a>
+                                <form asp-action="DeleteEvent" method="post" data-confirm="Delete this event? This can't be undone.">
+                                    <input type="hidden" name="id" value="@e.EventId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,52 @@
+@model ResultsPage
+@{ ViewData["Title"] = "Race results"; }
+<p class="mb-1"><a asp-action="Events">Back to events</a></p>
+<h1>Results for @Model.Event.EventName</h1>
+
+@if (!Model.Open)
+{
+    <div class="alert alert-warning" role="status">Results open on race day, @Model.Event.EventDate.ToString("d MMMM yyyy").</div>
+}
+else
+{
+    <p>Enter each finisher's position and finish time as hours:minutes:seconds, for example 1:23:45. Publishing makes the result visible to the participant straight away.</p>
+}
+
+@if (Model.Enrolments.Count == 0)
+{
+    <div class="empty-state"><p>Nobody is enrolled in this event.</p></div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table align-middle">
+            <thead><tr><th>Participant</th><th>Category</th><th>Position</th><th>Finish time</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var e in Model.Enrolments)
+                {
+                    var formId = $"result-{e.EnrolmentId}";
+                    <tr>
+                        <td>@e.ParticipantName</td>
+                        <td>@e.CategoryName</td>
+                        <td style="width:9rem">
+                            <label class="visually-hidden" for="pos-@e.EnrolmentId">Position for @e.ParticipantName</label>
+                            <input id="pos-@e.EnrolmentId" form="@formId" name="position" type="number" min="1" value="@e.Position" class="form-control" required disabled="@(!Model.Open)" />
+                        </td>
+                        <td style="width:11rem">
+                            <label class="visually-hidden" for="time-@e.EnrolmentId">Finish time for @e.ParticipantName</label>
+                            <input id="time-@e.EnrolmentId" form="@formId" name="time" value="@RaceFormat.TimeInput(e.TimeSeconds)" placeholder="1:23:45" pattern="\d{1,3}:\d{1,2}(:\d{1,2}(\.\d+)?)?" class="form-control" required disabled="@(!Model.Open)" />
+                        </td>
+                        <td>
+                            <form id="@formId" method="post" asp-action="SaveResult">
+                                <input type="hidden" name="eventId" value="@Model.Event.EventId" />
+                                <input type="hidden" name="enrolmentId" value="@e.EnrolmentId" />
+                                <input type="hidden" name="resultId" value="@e.ResultId" />
+                                <button type="submit" class="btn btn-brand" disabled="@(!Model.Open)">@(e.ResultId.HasValue ? "Update" : "Publish")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
