@@ -609,16 +609,17 @@ Explain:
 - Show the GitHub Actions workflow.
 - Demonstrate a successful build.
 
-**7. Conclusion**
+### GitHub Actions Build Status
 
-Summarise the functionality and technologies used.
+<img width="1902" height="636" alt="image" src="https://github.com/user-attachments/assets/d1100086-5340-479d-9c13-b7ac4139e083" />
+
 
 ### YouTube Video Link
 
 **Unlisted Demonstration:** [INSERT YOUTUBE VIDEO LINK]
 
 
-## 19. Conclusion
+## Conclusion
 
 The RaceDay Event Management System combines planning, database design, RESTful API development and an ASP.NET Core MVC frontend to provide a complete event management solution.
 
